@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { GraduationCap, Briefcase, Users, UserCheck, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const transition = { type: "spring", duration: 0.4, bounce: 0 };
+const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
 const roles: { value: AppRole; label: string; description: string; icon: React.ReactNode }[] = [
   { value: 'student', label: 'Student', description: 'Access study halls and book loans.', icon: <GraduationCap className="h-6 w-6" /> },

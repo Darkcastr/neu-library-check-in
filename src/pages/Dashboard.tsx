@@ -8,7 +8,7 @@ import { LogOut, Clock, BookOpen, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
-const transition = { type: "spring", duration: 0.4, bounce: 0 };
+const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
 const visitReasons = [
   'Study',

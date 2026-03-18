@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 
-const transition = { type: "spring", duration: 0.4, bounce: 0 };
+const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
