@@ -91,17 +91,18 @@ export default function Dashboard() {
             <BookOpen className="h-5 w-5 text-primary" />
             <span className="font-semibold text-sm text-foreground">NEU Library</span>
           </div>
-          <button onClick={signOut} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <LogOut className="h-4 w-4" />
-            Sign out
-          </button>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-lg px-4 py-8">
-        {/* Greeting */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={transition}>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{greeting}</h1>
+          <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Link to="/admin" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
+            <button onClick={signOut} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </div>
           {profile?.role === 'student' && profile.college && (
             <p className="text-sm text-muted-foreground mt-0.5">{profile.college}</p>
           )}
