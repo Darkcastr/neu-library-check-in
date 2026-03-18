@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          college: string | null
+          created_at: string
+          full_name: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          college?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          college?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      visit_logs: {
+        Row: {
+          checked_in_at: string
+          checked_out_at: string | null
+          created_at: string
+          id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          checked_in_at?: string
+          checked_out_at?: string | null
+          created_at?: string
+          id?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          checked_in_at?: string
+          checked_out_at?: string | null
+          created_at?: string
+          id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +79,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "teacher" | "staff" | "visitor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +206,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "teacher", "staff", "visitor"],
+    },
   },
 } as const
