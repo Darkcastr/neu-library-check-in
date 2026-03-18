@@ -4,9 +4,11 @@ import { useProfile } from '@/hooks/useProfile';
 import { useVisitLogs } from '@/hooks/useVisitLogs';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Clock, BookOpen, Loader2 } from 'lucide-react';
+import { LogOut, Clock, BookOpen, Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
@@ -45,6 +47,13 @@ export default function Dashboard() {
   const { logs, activeLog, checkIn, checkOut } = useVisitLogs(user?.id);
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   const handleCheckIn = async () => {
     if (!reason) {
@@ -82,10 +91,18 @@ export default function Dashboard() {
             <BookOpen className="h-5 w-5 text-primary" />
             <span className="font-semibold text-sm text-foreground">NEU Library</span>
           </div>
-          <button onClick={signOut} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <LogOut className="h-4 w-4" />
-            Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Link to="/admin" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
+            <button onClick={signOut} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
