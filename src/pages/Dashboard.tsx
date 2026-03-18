@@ -103,6 +103,13 @@ export default function Dashboard() {
               Sign out
             </button>
           </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-lg px-4 py-8">
+        {/* Greeting */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={transition}>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{greeting}</h1>
           {profile?.role === 'student' && profile.college && (
             <p className="text-sm text-muted-foreground mt-0.5">{profile.college}</p>
           )}
