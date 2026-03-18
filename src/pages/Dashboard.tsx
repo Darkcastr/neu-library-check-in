@@ -4,9 +4,11 @@ import { useProfile } from '@/hooks/useProfile';
 import { useVisitLogs } from '@/hooks/useVisitLogs';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Clock, BookOpen, Loader2 } from 'lucide-react';
+import { LogOut, Clock, BookOpen, Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
