@@ -47,6 +47,13 @@ export default function Dashboard() {
   const { logs, activeLog, checkIn, checkOut } = useVisitLogs(user?.id);
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   const handleCheckIn = async () => {
     if (!reason) {
