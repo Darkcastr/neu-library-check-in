@@ -141,6 +141,67 @@ export default function AdminDashboard() {
           </Popover>
         </div>
 
+        {/* Additional Filters */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex items-center gap-1.5">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">Filter by:</span>
+          </div>
+
+          <Select
+            value={filters.reason || '_all'}
+            onValueChange={(v) => setFilters(f => ({ ...f, reason: v === '_all' ? '' : v }))}
+          >
+            <SelectTrigger className="w-[150px] h-8 text-xs">
+              <SelectValue placeholder="All Reasons" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">All Reasons</SelectItem>
+              {availableReasons.map(r => (
+                <SelectItem key={r} value={r}>{r}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filters.college || '_all'}
+            onValueChange={(v) => setFilters(f => ({ ...f, college: v === '_all' ? '' : v }))}
+          >
+            <SelectTrigger className="w-[180px] h-8 text-xs">
+              <SelectValue placeholder="All Colleges" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">All Colleges</SelectItem>
+              {availableColleges.map(c => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="flex items-center gap-2">
+            <Switch
+              id="employee-filter"
+              checked={filters.employeeOnly}
+              onCheckedChange={(v) => setFilters(f => ({ ...f, employeeOnly: v }))}
+            />
+            <Label htmlFor="employee-filter" className="text-xs text-muted-foreground cursor-pointer">
+              Employees only
+            </Label>
+          </div>
+
+          {(filters.reason || filters.college || filters.employeeOnly) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs gap-1"
+              onClick={() => setFilters({ reason: '', college: '', employeeOnly: false })}
+            >
+              <X className="h-3 w-3" />
+              Clear
+            </Button>
+          )}
+        </div>
+
         {/* Currently Checked In */}
         {activeVisitors.length > 0 && (
           <motion.div
