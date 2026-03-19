@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface AdminVisitLog {
@@ -21,16 +21,22 @@ export interface AdminStats {
   avgDurationMinutes: number;
 }
 
+export interface AdminFilters {
+  reason: string;
+  college: string;
+  employeeOnly: boolean;
+}
+
 export function useAdminData() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [logs, setLogs] = useState<AdminVisitLog[]>([]);
-  const [stats, setStats] = useState<AdminStats>({ totalVisitsToday: 0, currentlyIn: 0, totalVisitsWeek: 0, avgDurationMinutes: 0 });
+  const [allLogs, setAllLogs] = useState<AdminVisitLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfDay(new Date()),
     to: new Date(),
   });
   const [filterMode, setFilterMode] = useState<'today' | 'week' | 'custom'>('today');
+  const [filters, setFilters] = useState<AdminFilters>({ reason: '', college: '', employeeOnly: false });
 
   useEffect(() => {
     checkAdmin();
@@ -55,7 +61,6 @@ export function useAdminData() {
   const fetchData = async () => {
     setLoading(true);
 
-    // Fetch all visit logs in date range
     const { data: visitData } = await supabase
       .from('visit_logs')
       .select('*')
@@ -63,7 +68,6 @@ export function useAdminData() {
       .lte('checked_in_at', dateRange.to.toISOString())
       .order('checked_in_at', { ascending: false });
 
-    // Fetch all profiles
     const { data: profileData } = await supabase
       .from('profiles')
       .select('user_id, full_name, role, college');
@@ -77,39 +81,47 @@ export function useAdminData() {
       profile: profileMap.get(log.user_id) ?? undefined,
     }));
 
-    setLogs(enrichedLogs);
+    setAllLogs(enrichedLogs);
+    setLoading(false);
+  };
 
-    // Currently checked in (all time, no date filter)
-    const { data: activeData } = await supabase
-      .from('visit_logs')
-      .select('id')
-      .is('checked_out_at', null);
+  // Apply client-side filters
+  const logs = useMemo(() => {
+    return allLogs.filter(log => {
+      if (filters.reason && log.reason !== filters.reason) return false;
+      if (filters.college && log.profile?.college !== filters.college) return false;
+      if (filters.employeeOnly && log.profile?.role !== 'teacher' && log.profile?.role !== 'staff') return false;
+      return true;
+    });
+  }, [allLogs, filters]);
 
-    const currentlyIn = activeData?.length ?? 0;
-
-    // Compute stats
+  // Compute stats from filtered logs
+  const stats = useMemo<AdminStats>(() => {
     const today = startOfDay(new Date());
     const weekAgo = new Date(today);
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const todayLogs = enrichedLogs.filter(l => new Date(l.checked_in_at) >= today);
-    const weekLogs = enrichedLogs.filter(l => new Date(l.checked_in_at) >= weekAgo);
+    const currentlyIn = logs.filter(l => !l.checked_out_at).length;
+    const todayLogs = logs.filter(l => new Date(l.checked_in_at) >= today);
+    const weekLogs = logs.filter(l => new Date(l.checked_in_at) >= weekAgo);
 
-    const completedLogs = enrichedLogs.filter(l => l.checked_out_at);
+    const completedLogs = logs.filter(l => l.checked_out_at);
     const totalDuration = completedLogs.reduce((sum, l) => {
       return sum + (new Date(l.checked_out_at!).getTime() - new Date(l.checked_in_at).getTime());
     }, 0);
     const avgDuration = completedLogs.length > 0 ? totalDuration / completedLogs.length / 60000 : 0;
 
-    setStats({
+    return {
       totalVisitsToday: todayLogs.length,
       currentlyIn,
       totalVisitsWeek: weekLogs.length,
       avgDurationMinutes: Math.round(avgDuration),
-    });
+    };
+  }, [logs]);
 
-    setLoading(false);
-  };
+  // Extract unique values for filter dropdowns
+  const availableReasons = useMemo(() => [...new Set(allLogs.map(l => l.reason))].sort(), [allLogs]);
+  const availableColleges = useMemo(() => [...new Set(allLogs.map(l => l.profile?.college).filter(Boolean) as string[])].sort(), [allLogs]);
 
   const applyFilter = (mode: 'today' | 'week' | 'custom', from?: Date, to?: Date) => {
     setFilterMode(mode);
@@ -124,7 +136,7 @@ export function useAdminData() {
     }
   };
 
-  return { isAdmin, logs, stats, loading, filterMode, dateRange, applyFilter, refetch: fetchData };
+  return { isAdmin, logs, stats, loading, filterMode, dateRange, applyFilter, filters, setFilters, availableReasons, availableColleges, refetch: fetchData };
 }
 
 function startOfDay(d: Date) {

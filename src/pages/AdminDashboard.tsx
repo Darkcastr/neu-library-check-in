@@ -4,12 +4,15 @@ import { useAdminData } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft } from 'lucide-react';
+import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import type { DateRange } from 'react-day-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
