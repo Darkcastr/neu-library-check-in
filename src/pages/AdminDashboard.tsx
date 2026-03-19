@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X, Download } from 'lucide-react';
-import { format } from 'date-fns';
+import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X, Download, BarChart3 } from 'lucide-react';
+import { format, eachDayOfInterval, startOfDay } from 'date-fns';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -24,6 +27,25 @@ export default function AdminDashboard() {
     from: dateRange.from,
     to: dateRange.to,
   });
+
+  const chartData = useMemo(() => {
+    if (!logs.length) return [];
+    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    return days.map(day => {
+      const dayStart = startOfDay(day);
+      const nextDay = new Date(dayStart);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const count = logs.filter(l => {
+        const d = new Date(l.checked_in_at);
+        return d >= dayStart && d < nextDay;
+      }).length;
+      return { date: format(day, 'MMM d'), visits: count };
+    });
+  }, [logs, dateRange]);
+
+  const chartConfig = {
+    visits: { label: 'Visits', color: 'hsl(var(--primary))' },
+  };
 
   if (authLoading || isAdmin === null) {
     return (
@@ -222,6 +244,36 @@ export default function AdminDashboard() {
             </Button>
           )}
         </div>
+
+        {/* Daily Visits Chart */}
+        {chartData.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="mb-8"
+          >
+            <Card className="border-border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  Daily Visit Trends
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                  <BarChart data={chartData}>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
+                    <YAxis tickLine={false} axisLine={false} fontSize={12} allowDecimals={false} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="visits" fill="var(--color-visits)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Currently Checked In */}
         {activeVisitors.length > 0 && (
