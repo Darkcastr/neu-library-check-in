@@ -4,18 +4,21 @@ import { useAdminData } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft } from 'lucide-react';
+import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import type { DateRange } from 'react-day-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
 export default function AdminDashboard() {
   const { user, loading: authLoading, signOut } = useAuth();
-  const { isAdmin, logs, stats, loading, filterMode, dateRange, applyFilter } = useAdminData();
+  const { isAdmin, logs, stats, loading, filterMode, dateRange, applyFilter, filters, setFilters, availableReasons, availableColleges } = useAdminData();
   const navigate = useNavigate();
   const [calendarRange, setCalendarRange] = useState<DateRange | undefined>({
     from: dateRange.from,
@@ -136,6 +139,67 @@ export default function AdminDashboard() {
               />
             </PopoverContent>
           </Popover>
+        </div>
+
+        {/* Additional Filters */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex items-center gap-1.5">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">Filter by:</span>
+          </div>
+
+          <Select
+            value={filters.reason || '_all'}
+            onValueChange={(v) => setFilters(f => ({ ...f, reason: v === '_all' ? '' : v }))}
+          >
+            <SelectTrigger className="w-[150px] h-8 text-xs">
+              <SelectValue placeholder="All Reasons" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">All Reasons</SelectItem>
+              {availableReasons.map(r => (
+                <SelectItem key={r} value={r}>{r}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filters.college || '_all'}
+            onValueChange={(v) => setFilters(f => ({ ...f, college: v === '_all' ? '' : v }))}
+          >
+            <SelectTrigger className="w-[180px] h-8 text-xs">
+              <SelectValue placeholder="All Colleges" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">All Colleges</SelectItem>
+              {availableColleges.map(c => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="flex items-center gap-2">
+            <Switch
+              id="employee-filter"
+              checked={filters.employeeOnly}
+              onCheckedChange={(v) => setFilters(f => ({ ...f, employeeOnly: v }))}
+            />
+            <Label htmlFor="employee-filter" className="text-xs text-muted-foreground cursor-pointer">
+              Employees only
+            </Label>
+          </div>
+
+          {(filters.reason || filters.college || filters.employeeOnly) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs gap-1"
+              onClick={() => setFilters({ reason: '', college: '', employeeOnly: false })}
+            >
+              <X className="h-3 w-3" />
+              Clear
+            </Button>
+          )}
         </div>
 
         {/* Currently Checked In */}
