@@ -28,19 +28,6 @@ export default function AdminDashboard() {
     to: dateRange.to,
   });
 
-  if (authLoading || isAdmin === null) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/auth" replace />;
-  if (!isAdmin) return <Navigate to="/" replace />;
-
-  const activeVisitors = logs.filter(l => !l.checked_out_at);
-
   const chartData = useMemo(() => {
     if (!logs.length) return [];
     const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
@@ -59,6 +46,19 @@ export default function AdminDashboard() {
   const chartConfig = {
     visits: { label: 'Visits', color: 'hsl(var(--primary))' },
   };
+
+  if (authLoading || isAdmin === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+
+  const activeVisitors = logs.filter(l => !l.checked_out_at);
 
   const exportCSV = () => {
     const headers = ['Name', 'Role', 'College', 'Reason', 'Checked In', 'Checked Out', 'Status'];
