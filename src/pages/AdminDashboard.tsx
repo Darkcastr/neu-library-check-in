@@ -18,7 +18,7 @@ const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
 export default function AdminDashboard() {
   const { user, loading: authLoading, signOut } = useAuth();
-  const { isAdmin, logs, stats, loading, filterMode, dateRange, applyFilter } = useAdminData();
+  const { isAdmin, logs, stats, loading, filterMode, dateRange, applyFilter, filters, setFilters, availableReasons, availableColleges } = useAdminData();
   const navigate = useNavigate();
   const [calendarRange, setCalendarRange] = useState<DateRange | undefined>({
     from: dateRange.from,
