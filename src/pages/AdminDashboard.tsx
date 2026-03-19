@@ -270,9 +270,17 @@ export default function AdminDashboard() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-sm font-semibold text-foreground mb-3">
-            Visit Log ({logs.length} visits)
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-foreground">
+              Visit Log ({logs.length} visits)
+            </h2>
+            {logs.length > 0 && (
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={exportCSV}>
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+            )}
+          </div>
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
