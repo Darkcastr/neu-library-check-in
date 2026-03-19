@@ -4,7 +4,7 @@ import { useAdminData } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X } from 'lucide-react';
+import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -37,6 +37,27 @@ export default function AdminDashboard() {
   if (!isAdmin) return <Navigate to="/" replace />;
 
   const activeVisitors = logs.filter(l => !l.checked_out_at);
+
+  const exportCSV = () => {
+    const headers = ['Name', 'Role', 'College', 'Reason', 'Checked In', 'Checked Out', 'Status'];
+    const rows = logs.map(log => [
+      log.profile?.full_name || 'Unknown',
+      log.profile?.role || '',
+      log.profile?.college || '',
+      log.reason,
+      format(new Date(log.checked_in_at), 'yyyy-MM-dd HH:mm:ss'),
+      log.checked_out_at ? format(new Date(log.checked_out_at), 'yyyy-MM-dd HH:mm:ss') : '',
+      log.checked_out_at ? 'Completed' : 'Active',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `visit-logs-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleDateSelect = (range: DateRange | undefined) => {
     setCalendarRange(range);
@@ -249,9 +270,17 @@ export default function AdminDashboard() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-sm font-semibold text-foreground mb-3">
-            Visit Log ({logs.length} visits)
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-foreground">
+              Visit Log ({logs.length} visits)
+            </h2>
+            {logs.length > 0 && (
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={exportCSV}>
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+            )}
+          </div>
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
