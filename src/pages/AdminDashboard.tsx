@@ -41,6 +41,25 @@ export default function AdminDashboard() {
 
   const activeVisitors = logs.filter(l => !l.checked_out_at);
 
+  const chartData = useMemo(() => {
+    if (!logs.length) return [];
+    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    return days.map(day => {
+      const dayStart = startOfDay(day);
+      const nextDay = new Date(dayStart);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const count = logs.filter(l => {
+        const d = new Date(l.checked_in_at);
+        return d >= dayStart && d < nextDay;
+      }).length;
+      return { date: format(day, 'MMM d'), visits: count };
+    });
+  }, [logs, dateRange]);
+
+  const chartConfig = {
+    visits: { label: 'Visits', color: 'hsl(var(--primary))' },
+  };
+
   const exportCSV = () => {
     const headers = ['Name', 'Role', 'College', 'Reason', 'Checked In', 'Checked Out', 'Status'];
     const rows = logs.map(log => [
