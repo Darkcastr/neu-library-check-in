@@ -38,6 +38,27 @@ export default function AdminDashboard() {
 
   const activeVisitors = logs.filter(l => !l.checked_out_at);
 
+  const exportCSV = () => {
+    const headers = ['Name', 'Role', 'College', 'Reason', 'Checked In', 'Checked Out', 'Status'];
+    const rows = logs.map(log => [
+      log.profile?.full_name || 'Unknown',
+      log.profile?.role || '',
+      log.profile?.college || '',
+      log.reason,
+      format(new Date(log.checked_in_at), 'yyyy-MM-dd HH:mm:ss'),
+      log.checked_out_at ? format(new Date(log.checked_out_at), 'yyyy-MM-dd HH:mm:ss') : '',
+      log.checked_out_at ? 'Completed' : 'Active',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `visit-logs-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleDateSelect = (range: DateRange | undefined) => {
     setCalendarRange(range);
     if (range?.from && range?.to) {
