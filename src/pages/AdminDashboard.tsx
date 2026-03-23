@@ -36,16 +36,25 @@ export default function AdminDashboard() {
       const dayStart = startOfDay(day);
       const nextDay = new Date(dayStart);
       nextDay.setDate(nextDay.getDate() + 1);
-      const count = logs.filter(l => {
+      const dayLogs = logs.filter(l => {
         const d = new Date(l.checked_in_at);
         return d >= dayStart && d < nextDay;
-      }).length;
-      return { date: format(day, 'MMM d'), visits: count };
+      });
+      return {
+        date: format(day, 'MMM d'),
+        student: dayLogs.filter(l => l.profile?.role === 'student').length,
+        teacher: dayLogs.filter(l => l.profile?.role === 'teacher').length,
+        staff: dayLogs.filter(l => l.profile?.role === 'staff').length,
+        visitor: dayLogs.filter(l => l.profile?.role === 'visitor' || !l.profile?.role).length,
+      };
     });
   }, [logs, dateRange]);
 
   const chartConfig = {
-    visits: { label: 'Visits', color: 'hsl(var(--primary))' },
+    student: { label: 'Students', color: 'hsl(var(--primary))' },
+    teacher: { label: 'Teachers', color: 'hsl(25 95% 53%)' },
+    staff: { label: 'Staff', color: 'hsl(142 71% 45%)' },
+    visitor: { label: 'Visitors', color: 'hsl(262 83% 58%)' },
   };
 
   if (authLoading || isAdmin === null) {
