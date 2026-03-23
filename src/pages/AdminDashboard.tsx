@@ -277,6 +277,7 @@ export default function AdminDashboard() {
                     <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
                     <YAxis tickLine={false} axisLine={false} fontSize={12} allowDecimals={false} />
                     <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
                     <Bar dataKey="student" stackId="a" fill="var(--color-student)" />
                     <Bar dataKey="teacher" stackId="a" fill="var(--color-teacher)" />
                     <Bar dataKey="staff" stackId="a" fill="var(--color-staff)" />
