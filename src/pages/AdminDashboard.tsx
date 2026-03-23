@@ -373,6 +373,16 @@ export default function AdminDashboard() {
             </div>
           )}
         </motion.div>
+
+        {/* Admin Role Management */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8"
+        >
+          <AdminRoleManager />
+        </motion.div>
       </main>
     </div>
   );
