@@ -16,6 +16,7 @@ import type { DateRange } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import AdminRoleManager from '@/components/AdminRoleManager';
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
@@ -371,6 +372,16 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
+        </motion.div>
+
+        {/* Admin Role Management */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8"
+        >
+          <AdminRoleManager />
         </motion.div>
       </main>
     </div>
