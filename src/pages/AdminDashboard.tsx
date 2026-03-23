@@ -16,6 +16,7 @@ import type { DateRange } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import AdminRoleManager from '@/components/AdminRoleManager';
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 
