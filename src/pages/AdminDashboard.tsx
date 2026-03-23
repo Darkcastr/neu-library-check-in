@@ -277,7 +277,10 @@ export default function AdminDashboard() {
                     <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
                     <YAxis tickLine={false} axisLine={false} fontSize={12} allowDecimals={false} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="visits" fill="var(--color-visits)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="student" stackId="a" fill="var(--color-student)" />
+                    <Bar dataKey="teacher" stackId="a" fill="var(--color-teacher)" />
+                    <Bar dataKey="staff" stackId="a" fill="var(--color-staff)" />
+                    <Bar dataKey="visitor" stackId="a" fill="var(--color-visitor)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ChartContainer>
               </CardContent>
