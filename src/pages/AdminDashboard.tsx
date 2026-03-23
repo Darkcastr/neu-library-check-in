@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { BookOpen, Users, Clock, TrendingUp, CalendarDays, Loader2, ArrowLeft, Filter, X, Download, BarChart3 } from 'lucide-react';
 import { format, eachDayOfInterval, startOfDay } from 'date-fns';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
@@ -36,16 +36,25 @@ export default function AdminDashboard() {
       const dayStart = startOfDay(day);
       const nextDay = new Date(dayStart);
       nextDay.setDate(nextDay.getDate() + 1);
-      const count = logs.filter(l => {
+      const dayLogs = logs.filter(l => {
         const d = new Date(l.checked_in_at);
         return d >= dayStart && d < nextDay;
-      }).length;
-      return { date: format(day, 'MMM d'), visits: count };
+      });
+      return {
+        date: format(day, 'MMM d'),
+        student: dayLogs.filter(l => l.profile?.role === 'student').length,
+        teacher: dayLogs.filter(l => l.profile?.role === 'teacher').length,
+        staff: dayLogs.filter(l => l.profile?.role === 'staff').length,
+        visitor: dayLogs.filter(l => l.profile?.role === 'visitor' || !l.profile?.role).length,
+      };
     });
   }, [logs, dateRange]);
 
   const chartConfig = {
-    visits: { label: 'Visits', color: 'hsl(var(--primary))' },
+    student: { label: 'Students', color: 'hsl(var(--primary))' },
+    teacher: { label: 'Teachers', color: 'hsl(25 95% 53%)' },
+    staff: { label: 'Staff', color: 'hsl(142 71% 45%)' },
+    visitor: { label: 'Visitors', color: 'hsl(262 83% 58%)' },
   };
 
   if (authLoading || isAdmin === null) {
@@ -268,7 +277,11 @@ export default function AdminDashboard() {
                     <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
                     <YAxis tickLine={false} axisLine={false} fontSize={12} allowDecimals={false} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="visits" fill="var(--color-visits)" radius={[4, 4, 0, 0]} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar dataKey="student" stackId="a" fill="var(--color-student)" />
+                    <Bar dataKey="teacher" stackId="a" fill="var(--color-teacher)" />
+                    <Bar dataKey="staff" stackId="a" fill="var(--color-staff)" />
+                    <Bar dataKey="visitor" stackId="a" fill="var(--color-visitor)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ChartContainer>
               </CardContent>
